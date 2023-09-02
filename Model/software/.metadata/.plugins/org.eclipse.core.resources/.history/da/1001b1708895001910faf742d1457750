@@ -1,0 +1,30 @@
+/*
+ * fft.h
+ *
+ *  Created on: 2017Äê3ÔÂ25ÈÕ
+ *      Author: shuai
+ */
+
+#ifndef FFT_H_
+#define FFT_H_
+
+#include "define.h"
+
+typedef enum{
+	fft_fifo_wr = 0,
+	fft_fifo_rd,
+	fft_fifo_rdem,
+	fft_fifo_wrfu,
+	fft_ram_rd,
+	fft_ram_rdad,
+	fft_ram_rdda,
+	fft_exp
+}FFTADDR;
+float FFTData[512];
+
+void FFTCtrl();
+void FFT_FIFOCtrl();
+void FFT_RAMCtrl();
+extern int stop1;
+
+#endif /* FFT_H_ */

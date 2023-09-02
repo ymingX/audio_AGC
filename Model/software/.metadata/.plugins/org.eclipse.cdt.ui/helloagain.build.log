@@ -1,0 +1,9 @@
+20:38:43 **** Incremental Build of configuration Nios II for project helloagain ****
+make all 
+Info: Building ../helloagain_bsp/
+C:/intelFPGA/17.0/nios2eds/bin/gnu/H-x86_64-mingw32/bin/make --no-print-directory -C ../helloagain_bsp/
+[BSP build complete]
+[helloagain build complete]
+
+20:38:43 Build Finished (took 872ms)
+

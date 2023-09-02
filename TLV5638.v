@@ -1,0 +1,80 @@
+module TLV5638 (
+    input [11:0]data,
+    input [5:0]conf,//conf[5:2] D15-D12配置，conf[1:0]：control模式下D1-D0
+    input clk,
+    input rst,
+	 input set,//置高时写control register
+    input enable,
+    output reg DIN_pin,
+    output reg CS_pin,
+    output  SCLK_pin
+);
+wire [5:0]config1;
+reg state;
+
+assign config1=(conf===6'bzzzzzz)?6'b110010:conf;
+reg [6:0]cnt;
+reg [15:0]wbuf;
+reg [15:0]wdata;
+always @(posedge clk ) begin
+    if(set|state)begin
+        wbuf<={1'b1,config1[4:3],1'b1,10'b1111111111,config1[1:0]};
+    end
+    else begin
+		  wbuf<={config1[5:2],data[11:0]};
+    end
+end
+
+always @(posedge clk) begin
+	 if(cnt==0)
+		wdata<=wbuf;
+    if(enable&rst)begin
+        cnt<=cnt+1;
+		  
+		  case (cnt)
+        0: begin
+            CS_pin<=1;
+				//wdata<=wbuf;
+        end
+        1:begin
+            CS_pin<=0;
+            DIN_pin<=wdata[15];
+        end
+        2:  DIN_pin<=wdata[14];
+        3:  DIN_pin<=wdata[13];
+        4:  DIN_pin<=wdata[12];
+        5:  DIN_pin<=wdata[11];
+        6:  DIN_pin<=wdata[10];
+        7:  DIN_pin<=wdata[9];
+        8:  DIN_pin<=wdata[8];
+        9:  DIN_pin<=wdata[7];
+        10: DIN_pin<=wdata[6];
+        11: DIN_pin<=wdata[5];
+        12: DIN_pin<=wdata[4];
+        13: DIN_pin<=wdata[3];
+        14: DIN_pin<=wdata[2];
+        15: DIN_pin<=wdata[1];
+        16: DIN_pin<=wdata[0];
+        17:begin
+            DIN_pin<=0;
+            CS_pin<=1;
+				state<=~state;
+        end
+        default: begin
+            DIN_pin<=0;
+				CS_pin<=1;
+
+        end
+    endcase
+		  
+    end
+    else begin
+        cnt<=0;
+        CS_pin<=1;
+    end
+end
+
+
+//assign SCLK_pin=(CS_pin)?0:clk;
+assign SCLK_pin=clk;
+endmodule

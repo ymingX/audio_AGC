@@ -1,0 +1,16 @@
+Fitter Status : Successful - Mon Oct 24 22:02:13 2022
+Quartus Prime Version : 17.0.0 Build 595 04/25/2017 SJ Standard Edition
+Revision Name : lemon
+Top-level Entity Name : lemon
+Family : Cyclone IV E
+Device : EP4CE40F23C8
+Timing Models : Final
+Total logic elements : 8,351 / 39,600 ( 21 % )
+    Total combinational functions : 5,890 / 39,600 ( 15 % )
+    Dedicated logic registers : 5,787 / 39,600 ( 15 % )
+Total registers : 5855
+Total pins : 182 / 329 ( 55 % )
+Total virtual pins : 0
+Total memory bits : 897,536 / 1,161,216 ( 77 % )
+Embedded Multiplier 9-bit elements : 12 / 232 ( 5 % )
+Total PLLs : 1 / 4 ( 25 % )

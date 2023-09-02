@@ -1,0 +1,38 @@
+
+#include "caculation.h"
+
+
+void quicksort(float array[], int min, int max)
+{
+    float p;
+    p = partition(array, min, max);
+    //printf("p = %d\n", p);
+
+    if (min < max)
+    {
+        quicksort(array, min, p - 1);
+        quicksort(array, p + 1, max);
+    }
+}
+
+int partition(float array[], int min, int max)
+{
+    float p;  p = array[min];
+    //int len = max;
+    while (min < max)
+    {
+        while (array[max] >= p && min < max)
+        {
+            max--;
+        }
+        array[min] = array[max];
+        while (array[min] <= p && min < max)
+        {
+            min++;
+        }
+        array[max] = array[min];
+    }
+    array[min] = p;
+    //printf("�ֽ磺%d\n", min);
+    return  min;
+}

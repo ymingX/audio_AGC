@@ -1,0 +1,16 @@
+/*
+ * test_img.h
+ *
+ *  Created on: 2018Äê11ÔÂ16ÈÕ
+ *      Author: 14409
+ */
+
+#ifndef TEST_IMG_H_
+#define TEST_IMG_H_
+#include "define.h"
+
+
+extern const u8 gImage_test2[45000];
+extern const u8 gImage_jpg1[57600];
+extern const u8 gImage_name1[36488];
+#endif /* TEST_IMG_H_ */

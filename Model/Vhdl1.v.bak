@@ -1,0 +1,49 @@
+`timescale 1ns/1ps
+/*
+Function: DPRAM for data aligned
+Author: Gui.
+Data: 2018年5月14日16:31:09
+*/
+/*
+ 等价于： dout <= {dout[Num-2:0],din};  // SliceM without rst
+*/
+module delay_all(din, clk, sclr, dout);
+parameter datwidth = 17;
+parameter Num = 8;
+
+input [datwidth-1:0] din;
+input clk;
+input sclr;
+output [Num-1:0][datwidth-1:0] dout;
+//
+logic [Num-1:0][datwidth-1:0] dat;
+
+genvar ii;
+generate 
+for (ii = 1;ii < Num; ii++)
+begin:delayall
+    delay #(
+        .datwidth(datwidth)
+    )
+    u1(
+        .din(dat[ii-1]),
+        .clk(clk),
+        .sclr(sclr),
+        .dout(dat[ii])
+    );
+end
+endgenerate
+
+always @(posedge clk)
+if(sclr)
+begin
+    dat <= 0;
+end 
+else
+begin
+    dat[0] <= din;
+end 
+
+assign dout = dat;
+
+endmodule

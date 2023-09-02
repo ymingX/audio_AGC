@@ -1,0 +1,27 @@
+/*
+ * ctrl.h
+ *
+ *  Created on: May 23, 2017
+ *      Author: hailiang
+ */
+
+#ifndef CTRL_H_
+#define CTRL_H_
+
+#include "key.h"
+#include "lcd.h"
+#include "touch.h"
+#include "fft.h"
+#include "caculation.h"
+
+int deviceInit();
+void ctrlInit();
+static double str_to_dou(char *str_ptr);
+
+
+
+int timerInit(void);
+void timerIsr(void);
+
+
+#endif /* CTRL_H_ */

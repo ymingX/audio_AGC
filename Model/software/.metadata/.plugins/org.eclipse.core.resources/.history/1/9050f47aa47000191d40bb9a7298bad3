@@ -1,0 +1,33 @@
+/*
+ * define.h
+ *
+ *  Created on: May 23, 2017
+ *      Author: hailiang
+ */
+
+#ifndef DEFINE_H_
+#define DEFINE_H_
+
+typedef unsigned char u8;
+typedef unsigned short u16;
+typedef unsigned long u32;
+typedef unsigned long long u64;
+
+typedef enum {
+	false = 0,
+	true = 1,
+}bool;
+
+#include "system.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stddef.h>
+#include <math.h>
+
+#include "io.h"
+#include "priv/alt_legacy_irq.h"
+#include "unistd.h"
+
+
+#endif /* DEFINE_H_ */

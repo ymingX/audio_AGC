@@ -1,0 +1,186 @@
+/*
+ * fft.c
+ *
+ *  Created on: 2018年11月27日
+ *      Author: 14409
+ */
+/*
+ * fft.c
+ *
+ *  Created on: 2017年3月25日
+ *      Author: shuai
+ */
+
+#include "fft.h"
+#include "lcd.h"
+#include "touch.h"
+#include "key.h"
+
+
+///////////fft总控制///////////////
+u16 j=0;
+extern int pause1;
+void FFTCtrl(){
+	j=0;
+	FFT_FIFOCtrl();
+	usleep(1000);
+	if(!(pause1%2))
+	 FFT_RAMCtrl();
+}
+///////////fft fifo控制///////////////
+void FFT_FIFOCtrl(){
+	IOWR(FFT_TOP_BASE, fft_fifo_rd, 1);
+	while((IORD(FFT_TOP_BASE, fft_fifo_rdem)&0x0001)==0){}
+	IOWR(FFT_TOP_BASE, fft_fifo_rd, 0);
+
+	IOWR(FFT_TOP_BASE, fft_fifo_wr, 1);
+	while((IORD(FFT_TOP_BASE, fft_fifo_wrfu)&0x0001)==0){}
+	IOWR(FFT_TOP_BASE, fft_fifo_wr, 0);
+
+	IOWR(FFT_TOP_BASE, fft_fifo_rd, 1);
+	while((IORD(FFT_TOP_BASE, fft_fifo_rdem)&0x0001)==0){}
+	IOWR(FFT_TOP_BASE, fft_fifo_rd, 0);
+}
+///////////fft ram控制///////////////
+
+extern int pause1;
+int stop1=0;
+void FFT_RAMCtrl(){
+	u16 i;
+	u16 i_pos;
+    float max_FFTDATA=0;
+	u32 rddata;
+	u16 freq;
+	int unfreq=0;
+	float power[256]={0};
+    float power_sum=0;
+	float shizhen=0;
+	float shizhendu=0;
+	float shizhendu_n=0;
+	float shizhendu_n1;
+	int exp;
+	int dist;//   fft的分辨率
+	IOWR(FFT_TOP_BASE, fft_ram_rd, 1);
+	exp = (IORD(FFT_TOP_BASE, fft_exp)) & 0x003F;
+	if(exp >= 32)
+		exp = exp - 64;
+	printf("exp: %d\n", exp);
+	if(model==4)
+		dist=20;
+	else
+		dist=50;
+//	float sum = 0;
+	if(!(pause1%2))
+	   lcdRectClear(100, 150, 500, 500, BACKGROUND);
+	for(i = 0; i < 256; i++){
+		IOWR(FFT_TOP_BASE, fft_ram_rdad, i);
+		rddata = IORD(FFT_TOP_BASE, fft_ram_rdda);
+		FFTData[i] = 1.0 * sqrt((int)rddata) * pow(2, -exp) / 2000;
+		//printf("%f\n",FFTData[i]);
+		if(FFTData[i]>=max_FFTDATA){
+		      max_FFTDATA=FFTData[i];
+		      i_pos=i;
+		}
+
+		if(FFTData[i] >50){
+			unfreq++;
+			//printf("%f\n",FFTData[i]);
+			FFTData[i]=FFTData[i]*5;   //mVpp
+			FFTData[i]=(FFTData[i]+0.5212)/1.05;
+			//printf("%d  %f  %fmV  power:%f mW\n", i,FFTData[i], 0.803*FFTData[i]/2*5,power[i]);
+            if(50*i<=10000&&!(pause1%2)){
+            if(IORD(PIO_0_BASE,0)){
+              power[i]= (FFTData[i]/2000)*(FFTData[i]/2)/2;
+			  lcdDispDecBig(100, 150+30*j,BLACK, WHITE, dist*i);
+			  lcdDispFloatBig(250, 150+30*j,BLACK, WHITE, FFTData[i]/11,2);
+			  lcdDispFloatBig(400, 150+30*j,BLACK, WHITE,power[i]/121,4);
+			  j++;
+			  power_sum=power_sum+power[i]/121;
+			  if(j!=1)
+			    shizhen=shizhen+(FFTData[i]/11)*(FFTData[i]/11);
+			  else
+			    shizhendu_n=(FFTData[i]/11)*(FFTData[i]/11);
+             }
+
+            else{
+              FFTData[i]=(FFTData[i]-18.088)/0.9915;
+              power[i]= (FFTData[i]/2000)*(FFTData[i]/2)/2;
+              lcdDispDecBig(100, 150+30*j,BLACK, WHITE, dist*i);
+              lcdDispFloatBig(250, 150+30*j,BLACK, WHITE, FFTData[i],2);
+              lcdDispFloatBig(400, 150+30*j,BLACK, WHITE,power[i],4);
+              j++;
+              power_sum=power_sum+power[i];
+			  if(j!=1)
+                shizhen=shizhen+(FFTData[i])*(FFTData[i]);
+			  else
+				 shizhendu_n=(FFTData[i])*(FFTData[i]);
+
+             }
+            }
+
+            if(50*i<=10000&&pause1%2)
+            {
+             if(IORD(PIO_0_BASE,0)){
+             power[i]= (FFTData[i]/2000)*(FFTData[i]/2)/2;
+    		 lcdDispDecBig(100, 150+30*j,BLACK, WHITE, dist*i);
+    		 lcdDispFloatBig(250, 150+30*j,BLACK, WHITE, FFTData[i]/11,2);
+    		 lcdDispFloatBig(400, 150+30*j,BLACK, WHITE,power[i]/121,4);
+    		 j++;
+             }
+
+			 else{
+			  FFTData[i]=(FFTData[i]-18.088)/0.9915;
+			  power[i]= (FFTData[i]/2000)*(FFTData[i]/2)/2;
+			  lcdDispDecBig(100, 150+30*j,BLACK, WHITE, dist*i);
+			  lcdDispFloatBig(250, 150+30*j,BLACK, WHITE, FFTData[i],2);
+			  lcdDispFloatBig(400, 150+30*j,BLACK, WHITE,power[i],4);
+			  j++;
+			 }
+            }
+			//  system("pause");
+		}
+	}         //fft的一个循环到此结束
+
+	if(unfreq==0){
+		lcdDispStringBig(0 ,0, BLUE, WHITE,"aperiodic");
+		printf("%d\n",1);
+	}
+
+	else
+		lcdDispStringBig(0 ,0, BLUE, WHITE," periodic");
+
+	if(!(pause1%2)){
+	  shizhendu=shizhen/shizhendu_n;
+	  shizhendu_n1=shizhendu;
+	  lcdRectClear(200, 50, 300, 75, BACKGROUND);
+	  lcdDispFloatBig(200, 50,BLACK, WHITE, shizhendu,3);
+	  lcdRectClear(450, 50, 500, 75, BACKGROUND);
+	  lcdDispFloatBig(450, 50,BLACK, WHITE, power_sum,3);
+	}
+	else
+	  lcdDispFloatBig(200, 50,BLACK, WHITE, shizhendu_n1,3);
+
+	printf("shizhendu:  %f\n",shizhendu);
+	max_FFTDATA=max_FFTDATA*5;
+	max_FFTDATA=(max_FFTDATA+0.5212)/1.05;
+	printf("%f\n",max_FFTDATA);
+	printf("%d\n",i_pos);
+
+	//IOWR(PIO_0_BASE,0,0);
+	if(max_FFTDATA<=455&&(!IORD(PIO_0_BASE,0))){
+		IOWR(PIO_0_BASE,0,1);
+	}
+
+	if(max_FFTDATA>5000){
+		 IOWR(PIO_0_BASE,0,0);
+	}
+//	printf("%d\n",IORD(PIO_0_BASE,0));
+	memset(FFTData, 0, sizeof FFTData);
+//	printf("sum: %f\n", sum);
+	IOWR(FFT_TOP_BASE, fft_ram_rd, 0);
+
+}
+
+
+
+

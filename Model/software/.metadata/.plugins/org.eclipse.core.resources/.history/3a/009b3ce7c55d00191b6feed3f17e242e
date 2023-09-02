@@ -1,0 +1,206 @@
+/*
+ * "Hello World" example.
+ *
+ * This example prints 'Hello from Nios II' to the STDOUT stream. It runs on
+ * the Nios II 'standard', 'full_featured', 'fast', and 'low_cost' example
+ * designs. It runs with or without the MicroC/OS-II RTOS and requires a STDOUT
+ * device in your system's hardware.
+ * The memory footprint of this hosted application is ~69 kbytes by default
+ * using the standard reference design.
+ *
+ * For a reduced footprint version of this template, and an explanation of how
+ * to reduce the memory footprint for a given application, see the
+ * "small_hello_world" template.
+ *
+ */
+
+#include <stdio.h>
+#include "define.h"
+#include "ctrl.h"
+#include "system.h"
+
+#define MAX_BUFFER 100
+#define NONE 0
+#define HAVE 1
+
+ int dou_post(char **str_ptr)
+{
+        int post_num = 0;
+        while((**str_ptr >='0')&&(**str_ptr <= '9')){
+                post_num = post_num * 10;
+                post_num += (**str_ptr - 48);
+                (*str_ptr)++;
+        }
+        if(**str_ptr == '.') (*str_ptr)--;
+        return post_num;
+}
+
+ double dou_point(char **str_ptr)
+{
+        double point_num = 0;
+        if((**str_ptr >='0')&&(**str_ptr <= '9')){
+                point_num = **str_ptr - 48;
+                (*str_ptr)++;
+                if((**str_ptr >='0')&&(**str_ptr <= '9')){
+                        point_num += dou_point(str_ptr);
+                }
+        }
+        if(**str_ptr == '\0') (*str_ptr)--;
+        return point_num / 10;
+}
+
+ double str_to_dou(char *str_ptr)
+{
+        int post_num = 0;
+        double point_num = 0;
+        int point_flag = NONE;
+
+        while(*str_ptr != '\0'){
+                if(*str_ptr == '.')
+                        point_flag = HAVE;
+                else if(point_flag == NONE)
+                        post_num =dou_post(&str_ptr);
+                else if(point_flag == HAVE)
+                        point_num =dou_point(&str_ptr);
+                str_ptr++;
+        }
+        return (double)post_num + point_num;
+}
+
+void keyboard(void)
+{
+//	lcdDrawVerLine(500,175,475,BLACK);
+//	lcdDrawHorLine(175,500,795,BLACK);
+	int i;
+	lcdDrawRectan(520, 175, 275, 300,BLACK);
+	lcdDrawVerLine(520+92, 175, 475, BLACK);
+	lcdDrawVerLine(520+184, 175, 475, BLACK);
+	lcdDrawHorLine(175+75, 520, 795, BLACK);
+	lcdDrawHorLine(175+150, 520,  795,BLACK);
+	lcdDrawHorLine(175+225, 520,  795,BLACK);
+	for( i=0;i<=2;i++)
+	  lcdDispDecBig(560+92*i, 205, BLUE, WHITE, i+1);
+	for( i=0;i<=2;i++)
+	  lcdDispDecBig(560+92*i, 280, BLUE, WHITE, i+4);
+	for( i=0;i<=2;i++)
+	  lcdDispDecBig(560+92*i, 355, BLUE, WHITE, i+7);
+	lcdDispDecBig(560+92, 355+75, BLUE, WHITE, 0);
+	lcdDispStringBig(560, 355+75, BLUE,  WHITE, ".");
+	lcdDispStringBig(560+92*2, 355+75+3, BLUE,  WHITE, "OK");
+}
+
+
+extern int local_x;
+extern int local_y;
+extern int status_value;
+
+int main() {
+	printf("Hello lemon\n");
+   // int x=0,y=0;
+    int botton[10];
+    int flag=0;
+    double input_data;
+    char str[MAX_BUFFER];
+    double model3_input=0;
+
+	if (deviceInit() < 0) {
+		printf("device initial failed\n");
+		return -1;
+	}
+	ctrlInit();
+
+	usleep(2000000);
+	lcdRectClear(0, 0, HDP, VDP, BACKGROUND);
+	Main_menu();
+	while (1) {
+		//IOWR(PIO_0_BASE,0,0);
+//      printf("per_cnt=%d\n",IORD(PIO_4_BASE,0));
+		//FFTCtrl();
+       // keyboard();
+	   if(model==0){
+//			//DisplayPic(200,50,150,150, gImage_test2,2);
+//
+		}
+		if(model==1&&TouchValidFlag&&status_value==1){
+			keyboard();
+			TouchValidFlag=0;
+	        flag++;str[flag-1]=TouchValue;
+	        printf("%c\n",str[flag-1]);
+	        if(TouchValue!='.')
+	          lcdDispDecBig(520+(flag-1)*12, 150, BLUE, WHITE,TouchValue-'0');
+	        else
+	          lcdDispStringBig(520+(flag-1)*12, 150, BLUE, WHITE,".");
+	        if(local_x>=705&&local_x<=795&&local_y>=400&&local_y<=475)
+	        {
+	        	//sscanf(str,"%lf",&input_data);
+	        	//input_data=atof(str);
+	        	input_data = str_to_dou(str);
+	        	model3_input=input_data;
+	        	printf("%f\n",input_data);
+	        	flag=0;
+	            lcdRectClear(520, 150, HDP, 173, BACKGROUND);
+	            usleep(1000);
+	            input_data=0;
+	            memset(str, 0, sizeof str);          //Çå¿ÕÊý×é
+	        }
+		}
+//
+//		if(model==2&&TouchValidFlag&&status_value==1)
+//		{
+//			TouchValidFlag=0;
+//			lcdDispStringBig(100 , 100, BLUE, WHITE,"freq");
+//			//lcdDispFloatBig(100,150, BLACK, WHITE,model2_input,3);
+//			lcdDispStringBig(300 , 100, BLUE, WHITE,"power");
+//		}
+//
+		if(model==3&&TouchValidFlag&&status_value==1)
+		{
+          //  printf("per_cnt=%d\n",IORD(PIO_4_BASE,0));
+		  //  TouchValidFlag=0;
+			lcdDispStringBig(100 , 100, BLUE, WHITE,"period(Hz):");
+			IOWR(PIO_1_BASE,0,model3_input);
+//			printf("model3input=%f",model3_input);
+//			IOWR(PIO_2_BASE,0,1);
+//		  	usleep(1000000);
+//			IOWR(PIO_2_BASE,0,0);
+			//model=0;
+		    lcdRectClear(100, 150, 200, 200, BACKGROUND);
+			lcdDispFloatBig(100,150, BLACK, WHITE,25600/(IORD(PIO_4_BASE,0)*2),2);
+		}
+
+
+	 if(model==2&&TouchValidFlag&&status_value==1)//50hz
+	 {
+		IOWR(PIO_3_BASE,0,0);
+		lcdDispStringBig(100 , 100, BLUE, WHITE,"freq/Hz");
+		lcdDispStringBig(250 , 100, BLUE, WHITE,"mVpp");
+		lcdDispStringBig(400 , 100, BLUE, WHITE,"power/mW");
+		lcdDispStringBig(100 ,50, BLUE, WHITE,"distor:");
+		lcdDispStringBig(330 ,50, BLUE, WHITE,"Pow_sum:");
+		FFTCtrl();
+		if(model==0){
+		  lcdRectClear(0, 0, HDP, VDP, BACKGROUND);
+		  Main_menu();
+		}
+	 }
+
+	 if(model==4&&TouchValidFlag&&status_value==1)//20hz
+	 {
+        IOWR(PIO_3_BASE,0,1);
+		lcdDispStringBig(100 , 100, BLUE, WHITE,"freq/Hz");
+		lcdDispStringBig(250 , 100, BLUE, WHITE,"mVpp");
+		lcdDispStringBig(400 , 100, BLUE, WHITE,"power/mW");
+		lcdDispStringBig(100 ,50, BLUE, WHITE,"distor:");
+		lcdDispStringBig(330 ,50, BLUE, WHITE,"Pow_sum:");
+		FFTCtrl();
+		if(model==0){
+		  lcdRectClear(0, 0, HDP, VDP, BACKGROUND);
+		  Main_menu();
+		}
+	 }
+	}
+	return 0;
+}
+
+
+

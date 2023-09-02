@@ -1,0 +1,43 @@
+module lcd
+(
+	input wire clk,
+	input wire rst_n,
+	input wire [31:0] lcd_data_wr,
+	output reg [31:0] lcd_data_rd,
+	input wire lcd_cs_n,
+	input wire lcd_wr_n,
+	input wire lcd_rd_n,
+	input wire lcd_a,
+
+	/**************************************/
+	inout [15:0] LCD_D,
+	output   LCD_CS,	//片选信号
+	output   LCD_WR,	//写信好
+	output   LCD_RD,
+	output   LCD_RS,	//数据命令选择端口
+	output   LCD_RST_N
+);
+
+assign LCD_RS = lcd_a;
+assign LCD_CS = lcd_cs_n;
+assign LCD_WR = lcd_wr_n || lcd_cs_n;
+assign LCD_RD = lcd_rd_n || lcd_cs_n;
+assign LCD_RST_N = rst_n;
+
+reg [15:0] rLCD_D;
+always @(posedge clk, negedge rst_n) begin
+	if(!rst_n) begin
+		rLCD_D <= 16'd0;
+		lcd_data_rd <= 0;
+	end
+	else if (!lcd_cs_n)begin
+		if(!lcd_wr_n)
+			rLCD_D <= lcd_data_wr[15:0];
+		else if(!lcd_rd_n)
+			lcd_data_rd <= LCD_D;
+	end
+end
+
+assign LCD_D = lcd_wr_n ? 16'hzzzz : rLCD_D;
+
+endmodule

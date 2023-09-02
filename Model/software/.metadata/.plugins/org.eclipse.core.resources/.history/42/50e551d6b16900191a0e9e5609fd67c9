@@ -1,0 +1,16 @@
+/*
+ * caculation.h
+ *
+ *  Created on: 2019Äê4ÔÂ28ÈÕ
+ *      Author: 10944
+ */
+
+#ifndef CACULATION_H_
+#define CACULATION_H_
+
+#include "define.h"
+
+void quicksort(float array[], int min, int max);
+int partition(float array[], int min, int max);
+
+#endif /* CACULATION_H_ */

@@ -1,0 +1,46 @@
+# # File gsaved with Nlview version 6.3.8  2013-12-19 bk=1.2992 VDI=34 GEI=35
+# 
+preplace inst NiosII_cpu.sdram -pg 1 -lvl 5 -y 850
+preplace inst NiosII_cpu.generic_tristate_controller.slave_translator -pg 1
+preplace inst NiosII_cpu.generic_tristate_controller -pg 1 -lvl 3 -y 440
+preplace inst NiosII_cpu.tristate_conduit_pin_sharer.pin_sharer -pg 1
+preplace inst NiosII_cpu.timer0 -pg 1 -lvl 5 -y 370
+preplace inst NiosII_cpu.sysid -pg 1 -lvl 5 -y 770
+preplace inst NiosII_cpu.tristate_conduit_pin_sharer.clock -pg 1
+preplace inst NiosII_cpu.generic_tristate_controller.tda -pg 1
+preplace inst NiosII_cpu.generic_tristate_controller.reset -pg 1
+preplace inst NiosII_cpu.tristate_conduit_bridge -pg 1 -lvl 5 -y 470
+preplace inst NiosII_cpu.cpu.clock_bridge -pg 1
+preplace inst NiosII_cpu.tristate_conduit_pin_sharer.reset -pg 1
+preplace inst NiosII_cpu.LCD_TOUCH_rst_n -pg 1 -lvl 5 -y 570
+preplace inst NiosII_cpu.led -pg 1 -lvl 5 -y 950
+preplace inst NiosII_cpu.jtag_uart -pg 1 -lvl 5 -y 270
+preplace inst NiosII_cpu.generic_tristate_controller.clk -pg 1
+preplace inst NiosII_cpu.LCD_TOUCH_INT -pg 1 -lvl 5 -y 150
+preplace inst NiosII_cpu.tristate_conduit_pin_sharer.arbiter -pg 1
+preplace inst NiosII_cpu.cpu.reset_bridge -pg 1
+preplace inst NiosII_cpu.I2C_Master -pg 1 -lvl 5 -y 30
+preplace inst NiosII_cpu -pg 1 -lvl 1 -y 40 -regy -20
+preplace inst NiosII_cpu.generic_tristate_controller.tdt -pg 1
+preplace inst NiosII_cpu.cpu.cpu -pg 1
+preplace inst NiosII_cpu.cpu -pg 1 -lvl 2 -y 310
+preplace inst NiosII_cpu.tristate_conduit_pin_sharer -pg 1 -lvl 4 -y 460
+preplace inst NiosII_cpu.clk_100M -pg 1 -lvl 1 -y 420
+preplace inst NiosII_cpu.LCD7 -pg 1 -lvl 5 -y 670
+preplace netloc INTERCONNECT<net_container>NiosII_cpu</net_container>(MASTER)cpu.instruction_master,(SLAVE)sysid.control_slave,(MASTER)cpu.data_master,(SLAVE)sdram.s1,(SLAVE)generic_tristate_controller.uas,(SLAVE)I2C_Master.avalon_slave,(SLAVE)jtag_uart.avalon_jtag_slave,(SLAVE)LCD7.avalon_slave,(SLAVE)cpu.debug_mem_slave,(SLAVE)LCD_TOUCH_INT.s1,(SLAVE)LCD_TOUCH_rst_n.s1,(SLAVE)led.s1,(SLAVE)timer0.s1) 1 1 4 360 270 720 620 NJ 620 1220
+preplace netloc EXPORT<net_container>NiosII_cpu</net_container>(SLAVE)NiosII_cpu.led,(SLAVE)led.external_connection) 1 0 5 NJ 980 NJ 980 NJ 980 NJ 980 NJ
+preplace netloc INTERCONNECT<net_container>NiosII_cpu</net_container>(SLAVE)LCD_TOUCH_INT.reset,(SLAVE)I2C_Master.reset_sink,(SLAVE)LCD7.reset_sink,(SLAVE)sdram.reset,(SLAVE)led.reset,(MASTER)cpu.debug_reset_request,(SLAVE)jtag_uart.reset,(SLAVE)timer0.reset,(SLAVE)generic_tristate_controller.reset,(SLAVE)LCD_TOUCH_rst_n.reset,(SLAVE)tristate_conduit_pin_sharer.reset,(SLAVE)sysid.reset,(SLAVE)tristate_conduit_bridge.reset,(SLAVE)cpu.reset,(MASTER)clk_100M.clk_reset) 1 1 4 340 230 740 560 1000 600 1260
+preplace netloc EXPORT<net_container>NiosII_cpu</net_container>(SLAVE)NiosII_cpu.lcd7,(SLAVE)LCD7.conduit_end) 1 0 5 NJ 720 NJ 720 NJ 720 NJ 720 NJ
+preplace netloc POINT_TO_POINT<net_container>NiosII_cpu</net_container>(SLAVE)tristate_conduit_bridge.tcs,(MASTER)tristate_conduit_pin_sharer.tcm) 1 4 1 1240
+preplace netloc EXPORT<net_container>NiosII_cpu</net_container>(SLAVE)tristate_conduit_bridge.out,(SLAVE)NiosII_cpu.flash) 1 0 5 NJ 580 NJ 580 NJ 580 NJ 580 NJ
+preplace netloc POINT_TO_POINT<net_container>NiosII_cpu</net_container>(SLAVE)tristate_conduit_pin_sharer.tcs0,(MASTER)generic_tristate_controller.tcm) 1 3 1 980
+preplace netloc FAN_OUT<net_container>NiosII_cpu</net_container>(SLAVE)timer0.irq,(SLAVE)I2C_Master.interrupt_sender,(MASTER)cpu.irq,(SLAVE)jtag_uart.irq,(SLAVE)LCD_TOUCH_INT.irq) 1 2 3 NJ 400 NJ 400 1240
+preplace netloc EXPORT<net_container>NiosII_cpu</net_container>(SLAVE)LCD_TOUCH_rst_n.external_connection,(SLAVE)NiosII_cpu.lcd_touch_rst_n) 1 0 5 NJ 250 NJ 250 NJ 380 NJ 380 NJ
+preplace netloc EXPORT<net_container>NiosII_cpu</net_container>(SLAVE)NiosII_cpu.reset,(SLAVE)clk_100M.clk_in_reset) 1 0 1 NJ
+preplace netloc EXPORT<net_container>NiosII_cpu</net_container>(SLAVE)NiosII_cpu.i2c_master,(SLAVE)I2C_Master.conduit_end) 1 0 5 NJ 80 NJ 80 NJ 80 NJ 80 NJ
+preplace netloc EXPORT<net_container>NiosII_cpu</net_container>(SLAVE)NiosII_cpu.lcd_touch_int,(SLAVE)LCD_TOUCH_INT.external_connection) 1 0 5 NJ 180 NJ 180 NJ 180 NJ 180 NJ
+preplace netloc EXPORT<net_container>NiosII_cpu</net_container>(SLAVE)NiosII_cpu.sdram,(SLAVE)sdram.wire) 1 0 5 NJ 920 NJ 920 NJ 920 NJ 920 NJ
+preplace netloc EXPORT<net_container>NiosII_cpu</net_container>(SLAVE)NiosII_cpu.clk,(SLAVE)clk_100M.clk_in) 1 0 1 NJ
+preplace netloc FAN_OUT<net_container>NiosII_cpu</net_container>(SLAVE)tristate_conduit_bridge.clk,(SLAVE)jtag_uart.clk,(SLAVE)sysid.clk,(SLAVE)tristate_conduit_pin_sharer.clk,(SLAVE)generic_tristate_controller.clk,(SLAVE)timer0.clk,(SLAVE)led.clk,(SLAVE)I2C_Master.clock,(MASTER)clk_100M.clk,(SLAVE)LCD_TOUCH_INT.clk,(SLAVE)sdram.clk,(SLAVE)LCD_TOUCH_rst_n.clk,(SLAVE)cpu.clk,(SLAVE)LCD7.clock) 1 1 4 320 210 780 540 1020 560 1320
+levelinfo -pg 1 0 110 1550
+levelinfo -hier NiosII_cpu 120 150 480 850 1090 1390 1540

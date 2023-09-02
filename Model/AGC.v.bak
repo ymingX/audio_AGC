@@ -1,0 +1,14 @@
+module AGC (
+    input clk_50M,
+    input rst,
+    input clk_sample,
+    input found,
+    input [11:0]ads805,
+    input [11:0]Vpp,
+    input [11:0]cnt,
+    output [11:0]DAdata
+);
+    reg [11:0] addata [2500:0];
+
+
+endmodule

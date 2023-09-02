@@ -1,0 +1,108 @@
+/*
+ * "Hello World" example.
+ *
+ * This example prints 'Hello from Nios II' to the STDOUT stream. It runs on
+ * the Nios II 'standard', 'full_featured', 'fast', and 'low_cost' example
+ * designs. It runs with or without the MicroC/OS-II RTOS and requires a STDOUT
+ * device in your system's hardware.
+ * The memory footprint of this hosted application is ~69 kbytes by default
+ * using the standard reference design.
+ *
+ * For a reduced footprint version of this template, and an explanation of how
+ * to reduce the memory footprint for a given application, see the
+ * "small_hello_world" template.
+ *
+ */
+
+#include <stdio.h>
+#include "define.h"
+#include "ctrl.h"
+#include "system.h"
+
+#define MAX_BUFFER 100
+#define NONE 0
+#define HAVE 1
+
+extern int status_value;
+
+
+int main() {
+	printf("Hello lemon\n");
+   // int x=0,y=0;
+    double model3_input=0;
+
+	if (deviceInit() < 0) {
+		printf("device initial failed\n");
+		return -1;
+	}
+	ctrlInit();
+
+	lcdRectClear(0, 0, HDP, VDP, BACKGROUND);
+	Main_menu();
+
+	while (1) {
+
+	   if(model==0){;}
+
+//
+//		if(model==2&&TouchValidFlag&&status_value==1)
+//		{
+//			TouchValidFlag=0;
+//			lcdDispStringBig(100 , 100, BLUE, WHITE,"freq");
+//			//lcdDispFloatBig(100,150, BLACK, WHITE,model2_input,3);
+//			lcdDispStringBig(300 , 100, BLUE, WHITE,"power");
+//		}
+//
+		if(model==3&&TouchValidFlag&&status_value==1)         //自相关做周期检测
+		{
+          //  printf("per_cnt=%d\n",IORD(PIO_4_BASE,0));
+		  //  TouchValidFlag=0;
+			lcdDispStringBig(100 , 100, BLUE, WHITE,"period(Hz):");
+			IOWR(PIO_1_BASE,0,model3_input);
+//			printf("model3input=%f",model3_input);
+//			IOWR(PIO_2_BASE,0,1);
+//		  	usleep(1000000);
+//			IOWR(PIO_2_BASE,0,0);
+			//model=0;
+		    lcdRectClear(100, 150, 200, 200, BACKGROUND);
+			lcdDispFloatBig(100,150, BLACK, WHITE,25600/(IORD(PIO_4_BASE,0)*2),2);
+		}
+
+
+	 if(model==2&&TouchValidFlag&&status_value==1)//50hz
+	 {
+		IOWR(PIO_3_BASE,0,0);
+		lcdDrawRectan(705, 10, 90, 55,BLACK);
+	    lcdDispStringBig(735,20, BLUE, WHITE,"save");
+		lcdDispStringBig(100 , 100, BLUE, WHITE,"freq/Hz");
+		lcdDispStringBig(250 , 100, BLUE, WHITE,"mVpp");
+		lcdDispStringBig(400 , 100, BLUE, WHITE,"power/mW");
+		lcdDispStringBig(100 ,50, BLUE, WHITE,"distor:");
+		lcdDispStringBig(330 ,50, BLUE, WHITE,"Pow_sum:");
+		FFTCtrl();
+		if(model==0){
+		  lcdRectClear(0, 0, HDP, VDP, BACKGROUND);
+		  Main_menu();
+		}
+	 }
+
+	 if(model==4&&TouchValidFlag&&status_value==1)//20hz
+	 {
+        IOWR(PIO_3_BASE,0,1);
+		lcdDispStringBig(100 , 100, BLUE, WHITE,"freq/Hz");
+		lcdDispStringBig(250 , 100, BLUE, WHITE,"mVpp");
+		lcdDispStringBig(400 , 100, BLUE, WHITE,"power/mW");
+		lcdDispStringBig(100 ,50, BLUE, WHITE,"distor:");
+		lcdDispStringBig(330 ,50, BLUE, WHITE,"Pow_sum:");
+		FFTCtrl();
+		if(model==0){
+		  lcdRectClear(0, 0, HDP, VDP, BACKGROUND);
+		  Main_menu();
+		}
+	 }
+	}
+	return 0;
+}
+
+
+

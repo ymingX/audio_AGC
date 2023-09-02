@@ -1,0 +1,142 @@
+/*
+ * fft.c
+ *
+ *  Created on: 2018年11月27日
+ *      Author: 14409
+ */
+/*
+ * fft.c
+ *
+ *  Created on: 2017年3月25日
+ *      Author: shuai
+ */
+
+#include "fft.h"
+#include "lcd.h"
+#include "touch.h"
+#include "key.h"
+#include "ctrl.h"
+
+
+///////////fft总控制///////////////
+u16 j=0;
+
+void FFTCtrl(){
+	j=0;
+	FFT_FIFOCtrl();
+	usleep(1000);
+	FFT_RAMCtrl();
+}
+///////////fft fifo控制///////////////
+void FFT_FIFOCtrl(){
+	IOWR(FFT_TOP_BASE, fft_fifo_rd, 1);
+	while((IORD(FFT_TOP_BASE, fft_fifo_rdem)&0x0001)==0){}
+	IOWR(FFT_TOP_BASE, fft_fifo_rd, 0);
+
+	IOWR(FFT_TOP_BASE, fft_fifo_wr, 1);
+	while((IORD(FFT_TOP_BASE, fft_fifo_wrfu)&0x0001)==0){}
+	IOWR(FFT_TOP_BASE, fft_fifo_wr, 0);
+
+	IOWR(FFT_TOP_BASE, fft_fifo_rd, 1);
+	while((IORD(FFT_TOP_BASE, fft_fifo_rdem)&0x0001)==0){}
+	IOWR(FFT_TOP_BASE, fft_fifo_rd, 0);
+}
+///////////fft ram控制///////////////
+
+int stop1=0;
+void FFT_RAMCtrl(){
+	u16 i;
+	u16 i_pos;
+	u32 rddata;
+//	int unfreq=0;
+//	int j=0;//用于排序算法
+//	int N=512;
+//	float shuju[512]={0};
+	float data;
+	float sum = 0, sum0 = 0;
+	float max_v[20] = {0};
+	unsigned short max_p[20] = {0};
+	unsigned short j, k, p = 0;
+	int m;
+
+
+	int exp;
+	int dist;//   fft的分辨率
+	IOWR(FFT_TOP_BASE, fft_ram_rd, 1);
+	exp = (IORD(FFT_TOP_BASE, fft_exp)) & 0x003F;
+	if(exp >= 32)
+		exp = exp - 64;
+	printf("exp: %d\n", exp);
+
+	if(model==4)
+		dist=20;
+	else
+		dist=50;
+
+	for(i = 0,j=0; i < 512; i++){
+		IOWR(FFT_TOP_BASE, fft_ram_rdad, i);
+		rddata = IORD(FFT_TOP_BASE, fft_ram_rdda);
+		FFTData[i] = 1.0 * sqrt((int)rddata) * pow(2, -exp) / 2000;
+		//printf("%f\n",FFTData[i]);
+		if((data = FFTData[i])>=30){
+			for(j = 0; j <= p+1 && j < 20; j++)
+				if (data > max_v[j])
+				{
+					for(k = ++p; --k > j;)
+						if(k < 20)
+						{
+							max_v[k] = max_v[k - 1];
+							max_p[k] = max_p[k - 1];
+						}
+					max_v[j] = data; max_p[j] = i;
+					break;
+				}
+			sum0 += data * data;
+		}
+
+	}//一次fft到此结束，各种操作需要在里面完成
+
+	lcdRectClear(100, 150, 500, 500, BACKGROUND);
+	for(i = -1; ++i < 3;){
+		lcdDispDecBig(100, 150+30*i, BLACK, WHITE, max_p[i] * dist);
+		lcdDispDecBig(250, 150+30*i, BLACK, WHITE, max_v[i]);
+	}
+
+
+//	for(i = 0,j=0; i < 512; i++){
+//	IOWR(FFT_TOP_BASE, fft_ram_rdad, i);
+//	rddata = IORD(FFT_TOP_BASE, fft_ram_rdda);
+//	FFTData[i] = 1.0 * sqrt((int)rddata) * pow(2, -exp) / 2000;
+//	//printf("%f\n",FFTData[i]);
+//	if(FFTData[i]>=30){
+//	   shuju[j]=FFTData[i];
+//	   j++;
+//	}
+//
+//	}//一次fft到此结束，各种操作需要在里面完成
+//
+//
+//    quicksort(shuju,0,N-1);
+//    change(shuju,N);
+//
+//	lcdRectClear(100, 150, 500, 500, BACKGROUND);
+//
+//	for(i=0;i<=j-1;i++){
+//		for(m=0;m<=N-1;m++)              //寻找元素
+//			if (shuju[i]==FFTData[m])
+//				break;
+//	lcdDispDecBig(100, 150+30*i,BLACK, WHITE, dist*m);
+//	lcdDispDecBig(250, 150+30*i,BLACK, WHITE,shuju[i]);
+//		printf("\n fsdfs%f \n\n",shuju[i]);
+//	}
+//
+//
+//	printf("个数 %d  dist %d \n",i_pos,dist);
+//	printf("功率 %f  dist %d \n",FFTData[i_pos],dist);
+//
+//	IOWR(FFT_TOP_BASE, fft_ram_rd, 0);
+}
+
+
+
+

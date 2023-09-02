@@ -1,0 +1,25 @@
+/*
+ * ctrl.h
+ *
+ *  Created on: May 23, 2017
+ *      Author: hailiang
+ */
+
+#ifndef CTRL_H_
+#define CTRL_H_
+
+#include "key.h"
+#include "lcd.h"
+#include "touch.h"
+#include "fft.h"
+
+int deviceInit();
+void ctrlInit();
+
+int timerInit(void);
+void timerIsr(void);
+
+void quicksort(float array[], int min, int max);
+int partition(float array[], int min, int max);
+
+#endif /* CTRL_H_ */

@@ -1,0 +1,56 @@
+/*
+ * key.c
+ *
+ *  Created on: May 23, 2017
+ *      Author: hailiang
+ */
+
+#include "key.h"
+
+
+void Main_menu(void)
+{
+	lcdDrawRectan(10, 10,130, 60,BLACK);
+    lcdDispStringBig(40,20, BLUE, WHITE,"FFT(50Hz)");
+
+	lcdDrawRectan(10, 70,130, 60,BLACK);
+    lcdDispStringBig(40,100, BLUE, WHITE,"per");
+
+	lcdDrawRectan(10, 130,130, 60,BLACK);
+    lcdDispStringBig(40,160, BLUE, WHITE,"FFT(20Hz)");
+}
+
+int keyInit(void) {
+	IOWR(KEYIRQ_BASE, 2, 0x07);
+	IOWR(KEYIRQ_BASE, 3, 0x00);
+	return alt_irq_register(KEYIRQ_IRQ, NULL, (void *) keyIsr);
+}
+
+extern int model;
+
+void keyIsr(void* isr_context) {
+	IOWR(KEYIRQ_BASE, 3, 0x00);
+
+	volatile u8 keyirq;
+	volatile u8 keyvalue;
+
+	keyirq = IORD(KEYIRQ_BASE, 0) & 0xff;
+	keyvalue = IORD(KEYVALUE_BASE, 0) & 0xff;
+    if(keyirq==0x1&&keyvalue==0x5){
+	  lcdRectClear(0, 0, HDP, VDP, BACKGROUND);
+	//  lcdRectClear(0, 0, HDP, VDP, BACKGROUND);
+	  Main_menu();
+	  model=0;
+    }
+
+    else  if(keyirq==0x1&&keyvalue==0x6){
+    	pause1 = !pause1;
+    	printf("%d\n",pause1);
+    }
+
+
+    else
+      lcdRectClear(0, 0, HDP, VDP, BACKGROUND);
+	printf("keyirq = 0x%x, keyvalue = 0x%x\n", keyirq, keyvalue);
+}
+

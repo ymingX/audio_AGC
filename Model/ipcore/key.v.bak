@@ -1,0 +1,111 @@
+module key
+(
+input clk,               //   50 MHz
+input SW_code,
+input SW_code_L,
+input SW_code_R,
+input SW1,
+input SW2,
+input [3:0]key,
+
+output reg [2:0]STATE,
+output reg [2:0]INT
+);
+wire [6:0]STA;
+reg [2:0]STATE_;
+
+assign STA[0]=key[0];
+assign STA[1]=key[1];
+assign STA[2]=key[2];
+assign STA[3]=key[3];
+assign STA[4]=SW1;
+assign STA[5]=SW2;
+assign STA[6]=SW_code;
+
+always@(STA)
+begin
+   case(STA)
+	7'b1111_110:STATE_<=3'd1;
+	7'b1111_101:STATE_<=3'd2;
+	7'b1111_011:STATE_<=3'd3;
+	7'b1110_111:STATE_<=3'd4;
+	7'b1101_111:STATE_<=3'd5;
+	7'b1011_111:STATE_<=3'd6;
+	7'b0111_111:STATE_<=3'd7;
+	default:STATE_<=3'd0;
+	endcase
+end
+
+wire  clk1;
+reg  [4:0]delay;
+reg  [1:0]sta;
+always@(posedge clk1)
+begin
+    if(STATE_==3'd0)
+	   begin
+		   delay<=5'd0;
+			sta=2'b00;
+			INT[0]=1'b0;
+		end
+	 else
+	   begin
+		   case(sta)
+			  2'b00:begin
+			           STATE<=STATE_;
+						  sta<=2'b01;
+			        end
+			  2'b01:begin
+			           if(delay<=5'd25)
+						    begin
+			              delay<=delay+1;
+							  sta<=2'b01;
+							 end
+						  else
+						     sta<=2'b11;
+	              end
+			  2'b11:begin
+			          sta<=sta;
+			           if(STATE==STATE_)
+						     begin
+								 INT[0]=1'b1;
+							  end
+						  else
+							  begin
+							  sta<=sta;
+						     end
+	              end
+				default:sta<=sta;
+			endcase
+	   end
+end
+
+reg [31:0] count;
+assign clk1=count[31];
+always @(posedge clk)//1kHz
+begin
+  count<=count+32'd85899;
+end
+
+reg [1:0]state;
+reg  int_l,int_r;
+always @(posedge clk1)
+begin
+   state[0]<=SW_code_R;
+	state[1]<=SW_code_L;
+	INT[2:1]={int_l,int_r};
+   if(SW_code_L|SW_code_R)begin
+	    int_l<=1'b0;
+		 int_r<=1'b0;
+	end
+	else begin
+	    if(!SW_code_L&state[0])
+				int_l<=1'b1;
+		 else if(!SW_code_R&state[1])int_r<=1'b1;
+		 else begin
+		      int_l<=int_l;
+				int_r<=int_r;
+		 end
+	end
+end
+endmodule
+
